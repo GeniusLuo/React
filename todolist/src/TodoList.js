@@ -1,8 +1,7 @@
 import React, {Component, Fragment} from 'react';
-import TodoItem from "./TodoItem";
-import Test from "./test";
+import TodoItem from './TodoItem';
 import './style.css'
-
+import axios from 'axios'
 class TodoList extends Component {
 
   constructor(props) {
@@ -18,7 +17,6 @@ class TodoList extends Component {
   }
 
   render() { // jsx语法
-    console.log('render')
     return (
       <Fragment>
         <label htmlFor="insertArea">输入内容</label> {/*这里htmlFor语法*/}
@@ -30,9 +28,14 @@ class TodoList extends Component {
         <ul>
           {this.getTodoItem()}
         </ul>
-        <Test content={this.state.inputVal}/>
       </Fragment>
     )
+  }
+
+  componentDidMount() {
+    axios.get('/api/todolist')
+      .then(() => {alert('success')})
+      .catch(() => alert('error'))
   }
 
   getTodoItem() {

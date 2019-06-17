@@ -9,12 +9,16 @@ class TodoItem extends Component {
     this.handleClick = this.handleClick.bind(this)
   }
 
-  render() {
-    const {content, test} = this.props
+  shouldComponentUpdate(nextProps, nextState, nextContext) {
+    return nextProps.content !== this.props.content;
+  }
 
+  render() {
+    console.log('child render')
+    const {content} = this.props
     return (
       <div onClick={this.handleClick}>
-        {content} - {test}
+        {content}
       </div>
     )
   }
@@ -28,15 +32,9 @@ class TodoItem extends Component {
 
 /** 组件传值类型定义 **/
 TodoItem.propTypes = {
-  test: PropTypes.string.isRequired, // isRequired是必须传
-  content: PropTypes.arrayOf(PropTypes.number, PropTypes.string),
+  content: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   deleteItem: PropTypes.func,
   index: PropTypes.number
-}
-
-/** 组件传值默认值 **/
-TodoItem.defaultProps = {
-  test: 'hello world'
 }
 
 export default TodoItem;
