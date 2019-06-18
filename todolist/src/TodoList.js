@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import {Input, Button, List} from 'antd';
 import store from './store';
-import {getInputChangeAction, getAddItemAction, getDeleteItemAction} from './store/actionCreators'
+import {getInputChangeAction, getAddItemAction, getDeleteItemAction, getTodoList} from './store/actionCreators'
+import TodoListUI from "./TodoListUI";
 
 class TodoList extends Component {
 
@@ -12,6 +12,7 @@ class TodoList extends Component {
     this.handleInputChange = this.handleInputChange.bind(this)
     this.handleStoreChange = this.handleStoreChange.bind(this)
     this.handleBtnClick = this.handleBtnClick.bind(this)
+    this.handleItemDelete = this.handleItemDelete.bind(this)
     // 订阅store,当store改变时，会执行里面的函数
     store.subscribe(this.handleStoreChange)
   }
@@ -19,23 +20,18 @@ class TodoList extends Component {
 
   render() {
     return (
-      <div style={{marginTop: 10, marginLeft: 10}}>
-        <div>
-          <Input value={this.state.inputValue}
-                 placeholder="todo info"
-                 onChange={this.handleInputChange}
-                 style={{width: 300, marginRight: 10}}/>
-          <Button type="primary" onClick={this.handleBtnClick}>提交</Button>
-        </div>
-        <List
-          style={{marginTop: 10, width: 300}}
-          size="small"
-          bordered
-          dataSource={this.state.list}
-          renderItem={(item, index) => <List.Item onClick={this.handleItemDelete.bind(this, index)}>{item}</List.Item>}
-        />
-      </div>
+      <TodoListUI
+        inputValue={this.state.inputValue}
+        list={this.state.list}
+        handleInputChange={this.handleInputChange}
+        handleBtnClick={this.handleBtnClick}
+        handleItemDelete={this.handleItemDelete}/>
     )
+  }
+
+  componentDidMount() {
+    const action = getTodoList()
+    store.dispatch(action)
   }
 
   // input值改变时，更新store对应的值
