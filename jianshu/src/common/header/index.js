@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import {CSSTransition} from 'react-transition-group';
+import {connect} from 'react-redux';
+import {actionCreators} from './store';
 import {
   HeaderWrapper,
   Logo,
@@ -8,21 +10,22 @@ import {
   NavSearch,
   Addition,
   Button,
-  SearchWrapper
+  SearchWrapper,
+  SearchInfo,
+  SearchInfoTitle,
+  SearchInfoSwitch,
+  SearchInfoItem,
+  SearchInfoList
 } from "./style";
 
 class Header extends Component {
-
-  constructor(props, context) {
-    super(props, context);
-    this.state = {
-      focused: false
-    }
-    this.handleInputFocus = this.handleInputFocus.bind(this)
-    this.handleInputBlur = this.handleInputBlur.bind(this)
+  constructor(props) {
+    super(props);
   }
 
   render() {
+    const {focused, handleInputFocus, handleInputBlur} = this.props
+
     return (
       <HeaderWrapper>
         <Logo/>
@@ -35,13 +38,16 @@ class Header extends Component {
           </NavItem>
           <SearchWrapper>
             <CSSTransition timeout={200}
-                           in={this.state.focused}
+                           in={focused}
                            classNames='slide'>
-              <NavSearch onFocus={this.handleInputFocus}
-                         onBlur={this.handleInputBlur}
-                         className={this.state.focused ? 'focused' : ''}/>
+              <NavSearch onFocus={handleInputFocus}
+                         onBlur={handleInputBlur}
+                         className={focused ? 'focused' : ''}/>
             </CSSTransition>
-            <i className={this.state.focused ? 'focused iconfont' : 'iconfont'}>&#xe617;</i>
+            <i className={focused ? 'focused iconfont' : 'iconfont'}>&#xe617;</i>
+            {
+              this.getListArea()
+            }
           </SearchWrapper>
         </Nav>
         <Addition>
@@ -55,17 +61,55 @@ class Header extends Component {
     )
   }
 
-  handleInputFocus() {
-    this.setState({
-      focused: true
-    })
-  }
+  getListArea() {
+    const {focused, list, page} = this.props
+    const pageList= [];
 
-  handleInputBlur() {
-    this.setState({
-      focused: false
-    })
+    for (let i = (page - 1) * 10; i < page * 10; i++) {
+
+    }
+
+    if (focused) {
+      return (
+        <SearchInfo>
+          <SearchInfoTitle>
+            热门搜索
+            <SearchInfoSwitch>换一批</SearchInfoSwitch>
+          </SearchInfoTitle>
+          <SearchInfoList>
+            {
+              list.map((item) => (
+                <SearchInfoItem key={item}>{item}</SearchInfoItem>
+              ))
+            }
+          </SearchInfoList>
+        </SearchInfo>
+      )
+    } else {
+      return null
+    }
   }
 }
 
-export default Header;
+const mapStateToProps = (state) => {
+  return {
+    // immutable对象的get方法
+    focused: state.getIn(['header', 'focused']),
+    list: state.getIn(['header', 'list']),
+    page: state.getIn(['header', 'page']),
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    handleInputFocus() {
+      dispatch(actionCreators.getList())
+      dispatch(actionCreators.searchFocus())
+    },
+    handleInputBlur() {
+      dispatch(actionCreators.searchBlur())
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);
