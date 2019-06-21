@@ -25,7 +25,7 @@ class Header extends Component {
   }
 
   render() {
-    const {focused, handleInputFocus, handleInputBlur} = this.props
+    const {focused, list, handleInputFocus, handleInputBlur} = this.props
 
     return (
       <HeaderWrapper>
@@ -41,11 +41,11 @@ class Header extends Component {
             <CSSTransition timeout={200}
                            in={focused}
                            classNames='slide'>
-              <NavSearch onFocus={handleInputFocus}
+              <NavSearch onFocus={() => {handleInputFocus(list)}}
                          onBlur={handleInputBlur}
                          className={focused ? 'focused' : ''}/>
             </CSSTransition>
-            <i className={focused ? 'focused iconfont' : 'iconfont'}>&#xe617;</i>
+            <i className={focused ? 'focused iconfont zoom' : 'iconfont zoom'}>&#xe617;</i>
             {
               this.getListArea()
             }
@@ -68,8 +68,10 @@ class Header extends Component {
     const newList = list.toJS();
     const pageList = [];
     if (newList.length) {
-      for (let i = (page - 1) * 10; i < page * 10; i++) {
-        pageList.push(<SearchInfoItem key={newList[i]}>{newList[i]}</SearchInfoItem>)
+      for (let i = (page - 1) * 10; i < page * 10 ; i++) {
+        if(newList[i]) {
+          pageList.push(<SearchInfoItem key={newList[i]}>{newList[i]}</SearchInfoItem>)
+        }
       }
     }
 
@@ -79,7 +81,11 @@ class Header extends Component {
                     onMouseLeave={handleMouseLeave}>
           <SearchInfoTitle>
             热门搜索
-            <SearchInfoSwitch onClick={() => handleChangePage(page, totalPage)}>换一批</SearchInfoSwitch>
+            <SearchInfoSwitch onClick={() => handleChangePage(page, totalPage, this.spinIcon)}>
+              <i ref={(icon) => {
+                this.spinIcon = icon
+              }} className="iconfont spin">&#xe851;</i>换一批
+            </SearchInfoSwitch>
           </SearchInfoTitle>
           <SearchInfoList>
             {pageList}
@@ -105,8 +111,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    handleInputFocus() {
-      dispatch(actionCreators.getList())
+    handleInputFocus(list) {
+      list.size === 0 && dispatch(actionCreators.getList())
       dispatch(actionCreators.searchFocus())
     },
     handleInputBlur() {
@@ -118,7 +124,14 @@ const mapDispatchToProps = (dispatch) => {
     handleMouseLeave() {
       dispatch(actionCreators.mouseLeave())
     },
-    handleChangePage(page, totalPage) {
+    handleChangePage(page, totalPage, spin) {
+      let originAngle = spin.style.transform.replace(/[^0-9]/ig, '')
+      if (originAngle) {
+        originAngle = parseInt(originAngle, 10)
+      } else {
+        originAngle = 0
+      }
+      spin.style.transform = `rotate(${originAngle + 360}deg)`
       if (page < totalPage) {
         dispatch(actionCreators.changePage(page + 1))
       } else {
