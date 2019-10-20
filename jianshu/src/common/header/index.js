@@ -20,9 +20,6 @@ import {
 } from "./style";
 
 class Header extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     const {focused, list, handleInputFocus, handleInputBlur} = this.props

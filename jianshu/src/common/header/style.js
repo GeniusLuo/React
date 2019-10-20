@@ -107,6 +107,7 @@ export const SearchInfo = styled.div`
   border: 1px solid #f0f0f0;
   box-shadow: 0 0 8px rgba(0,0,0,.2);
   padding: 0 20px;
+  background: #fff;
 `
 
 export const SearchInfoTitle = styled.div`
