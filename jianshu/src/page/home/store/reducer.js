@@ -1,25 +1,38 @@
-import {fromJS} from 'immutable'
+import { fromJS } from 'immutable';
+import * as constants from './constants';
 
-// 将普通js对象转化为immutable对象
 const defaultState = fromJS({
-  topicList: [
-    {
-      id: 1,
-      title: '社会热点',
-      imgUrl: 'https://upload.jianshu.io/users/upload_avatars/7290998/f64f5ef0-def0-4b26-beb3-b9d88f060ba0.jpg?imageMogr2/auto-orient/strip|imageView2/1/w/96/h/96/format/webp'
-    },
-    {
-      id: 2,
-      title: '手绘',
-      imgUrl: 'https://upload.jianshu.io/users/upload_avatars/7290998/f64f5ef0-def0-4b26-beb3-b9d88f060ba0.jpg?imageMogr2/auto-orient/strip|imageView2/1/w/96/h/96/format/webp'
-    },
-  ]
-})
+	topicList: [],
+	articleList: [],
+	recommendList: [],
+	articlePage: 1,
+	showScroll: false
+});
+
+const changeHomeData = (state, action) => {
+	return state.merge({
+		topicList: fromJS(action.topicList),
+		articleList: fromJS(action.articleList),
+		recommendList: fromJS(action.recommendList)
+	});
+};
+
+const addArticleList = (state, action) => {
+	return state.merge({
+		'articleList': state.get('articleList').concat(action.list),
+		'articlePage': action.nextPage
+	});
+};
 
 export default (state = defaultState, action) => {
-  switch (action.type) {
-    // immutable对象的set方法，会结合之前immutable对象的值和设置的值，返回一个全新的对象
-    default:
-      return state
-  }
+	switch(action.type) {
+		case constants.CHANGE_HOME_DATA:
+			return changeHomeData(state, action);
+		case constants.ADD_ARTICLE_LIST:
+			return addArticleList(state, action);
+		case constants.TOGGLE_SCROLL_TOP:
+			return state.set('showScroll', action.show);
+		default:
+			return state;
+	}
 }
